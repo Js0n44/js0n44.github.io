@@ -21,15 +21,17 @@
     </style>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            const message = `this isn't a virus, but it could have been,\nso chump.`;
-            const blob = new Blob([message], { type: 'text/plain' });
-            const downloadLink = document.createElement('a');
-            downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = 'notavirus.txt';
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-            URL.revokeObjectURL(downloadLink.href);
+            setTimeout(() => {
+                const message = `this isn't a virus, but it could have been,\nso chump.`;
+                const blob = new Blob([message], { type: 'text/plain' });
+                const downloadLink = document.createElement('a');
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = 'notavirus.txt';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                URL.revokeObjectURL(downloadLink.href);
+            }, 1500);
         });
     </script>
 </head>
