@@ -22,7 +22,7 @@
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                const message = `this isn't a virus, but it could have been,\nchump.`;
+                const message = `this isn't a virus, but it could have been.\nchump.`;
                 const blob = new Blob([message], { type: 'text/plain' });
                 const downloadLink = document.createElement('a');
                 downloadLink.href = URL.createObjectURL(blob);
