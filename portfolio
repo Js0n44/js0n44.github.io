@@ -28,7 +28,13 @@
 <section id="portfolio">
   <h2>Game Portfolio</h2>
   <p>Performance transparency for acquisition inquiries.</p>
+
+  <p class="portfolio-note">
+    We are always open to sell % in games for the right price, so we display how much % in each game we still own, for your convenience.
+  </p>
+
   <div class="grid-3" id="portfolio-grid"></div>
+  
   <div class="warning">
     I can smell a scam from a mile away. Legitimate offers only.
   </div>
