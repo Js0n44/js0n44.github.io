@@ -49,7 +49,7 @@ body {
 
 /* Header */
 header {
-  padding: 20px 8%;
+  padding: 14px 8%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -60,10 +60,18 @@ header {
   box-shadow: 0 2px 10px rgba(0,0,0,0.4);
 }
 
-header strong {
-  font-size: 1.5rem;
-  color: var(--accent);
-  letter-spacing: 1px;
+/* ===== LOGO ===== */
+.header-logo {
+  height: 42px;
+  width: auto;
+  display: block;
+  /* Subtle glow to match the site's orange accent */
+  filter: drop-shadow(0 0 8px rgba(255, 122, 24, 0.4));
+  transition: filter 0.3s ease;
+}
+
+.header-logo:hover {
+  filter: drop-shadow(0 0 14px rgba(255, 122, 24, 0.7));
 }
 
 nav a {
@@ -172,11 +180,17 @@ p {
   gap: 30px;
 }
 
+/* ===== ABOUT GRID: responsive flex that wraps on mobile ===== */
 #about .grid-3 {
   display: flex;
-  flex-wrap: nowrap;      
-  justify-content: center; 
-  gap: 30px;           
+  flex-wrap: wrap;        /* was nowrap — this is the mobile fix */
+  justify-content: center;
+  gap: 30px;
+}
+
+#about .grid-3 .card {
+  flex: 1 1 280px;        /* grow & shrink, but don't go below 280px */
+  max-width: 420px;       /* keep them from getting huge on wide screens */
 }
 
 @media (max-width: 900px) {
@@ -188,6 +202,12 @@ p {
 @media (max-width: 600px) {
   .grid-3 {
     grid-template-columns: 1fr;
+  }
+
+  /* On small screens, about cards go full width */
+  #about .grid-3 .card {
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 }
 
@@ -418,13 +438,20 @@ footer {
   .hero p {
     font-size: 1rem;
   }
+
+  /* Shrink nav links a bit on mobile so they don't crowd the logo */
+  nav a {
+    margin-left: 15px;
+    font-size: 0.9rem;
+  }
 }
 </style>
 </head>
 <body>
 
 <header>
-  <strong>Chabungus LLC</strong>
+  <!-- Replace the src path below with the actual path/filename of your logo PNG -->
+  <img src="/Chabungus Logo.png" alt="Chabungus LLC" class="header-logo" />
   <nav>
     <a href="#about">About</a>
     <a href="#portfolio">Portfolio</a>
