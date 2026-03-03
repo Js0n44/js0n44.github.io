@@ -9,43 +9,51 @@
   --orange-glow: rgba(255, 122, 24, 0.25);
 }
 
-/* Contact Section */
+
+
+
+/* Contact Section - Dark Mode Fix */
 #contact {
   padding: 60px 20px;
-  background-color: #f9fafb;
-  text-align: center;
+  background-color: var(--card); /* dark card background */
+  color: white;                  /* default text white */
+  text-align: center;            /* center all text */
 }
 
 #contact h2 {
   font-size: 2.5rem;
   margin-bottom: 15px;
-  color: #ff7a18;
+  color: var(--accent);          /* site accent color */
 }
 
 #contact p {
   font-size: 1.1rem;
   margin-bottom: 40px;
-  color: #333;
+  color: var(--muted);           /* muted light text for readability */
 }
 
 .contact-grid {
   display: flex;
   justify-content: center;
+  align-items: center;           /* vertical alignment */
+  flex-wrap: wrap;               /* wrap on smaller screens */
+  gap: 25px;
 }
 
 .contact-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  background: rgba(27,27,34,0.9);  /* dark semi-transparent card */
   padding: 35px 25px;
+  border-radius: 12px;
   max-width: 400px;
   width: 100%;
+  text-align: center;               /* center all content */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .contact-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.5);
 }
 
 .contact-card h3 {
@@ -55,20 +63,20 @@
 
 .contact-card p {
   margin-bottom: 20px;
-  font-size: 1rem;
-  color: #555;
+  color: var(--muted);
 }
 
 .contact-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  background-color: #7289da; /* Discord blue */
+  background-color: #7289da;
   color: white;
   padding: 12px 20px;
   border-radius: 8px;
-  text-decoration: none;
   font-weight: bold;
+  text-decoration: none;
   transition: background-color 0.3s ease;
 }
 
@@ -79,6 +87,12 @@
 .contact-btn .icon {
   width: 22px;
   height: 22px;
+}
+
+.server-note {
+  margin-top: 15px;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .server-note {
