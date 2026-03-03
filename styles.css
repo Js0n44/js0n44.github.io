@@ -22,6 +22,15 @@ body {
   scroll-behavior: smooth;
 }
 
+.portfolio-note {
+  background-color: #f0f4f8; /* light highlight */
+  padding: 10px 15px;
+  border-left: 4px solid #007bff; /* accent line */
+  font-weight: bold;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
 /* ===== Custom Scrollbar ===== */
 ::-webkit-scrollbar {
   width: 8px;
