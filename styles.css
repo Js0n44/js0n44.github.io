@@ -220,8 +220,14 @@ p {
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-accent);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Clip only the ::before gradient border, not the card content */
+.card > *:not(.card-overlay) {
+  position: relative;
+  z-index: 1;
 }
 
 .card:hover {
@@ -256,6 +262,8 @@ p {
   font-weight: 600;
   letter-spacing: 0.5px;
   border-radius: var(--radius-lg);
+  overflow: hidden;
+  z-index: 2;
 }
 .card:hover .card-overlay { opacity: 1; }
 
