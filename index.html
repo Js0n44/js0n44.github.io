@@ -1,28 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<title>Chabungus LLC - Roblox</title>
-<meta property="og:title" content="Chabungus LLC - Roblox Games & Investments">
-<meta property="og:description" content="We develop and invest in Roblox games, boosting retention and revenue.">
-<meta property="og:url" content="https://chabungus.com">
-
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
-<link rel="icon" href="/Chabungus C 128.png">
-<link rel="stylesheet" href="styles.css">
-
-
+  <title>Chabungus LLC - Roblox</title>
+  <meta property="og:title" content="Chabungus LLC - Roblox Games & Investments">
+  <meta property="og:description" content="We develop and invest in Roblox games, boosting retention and revenue.">
+  <meta property="og:url" content="https://chabungus.com">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/Chabungus C 128.png">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<header>
-  <!-- Replace the src path below with the actual path/filename of your logo PNG -->
-  <img src="/Chabungus Logo.png" alt="Chabungus LLC" class="header-logo" />
-  <nav>
+<header class="site-header">
+  <img src="/Chabungus Logo.png" alt="Chabungus LLC" class="site-logo" />
+  <nav class="nav">
     <a href="#about">About</a>
     <a href="#portfolio">Portfolio</a>
     <a href="#invest">Invest</a>
@@ -31,18 +24,20 @@
 </header>
 
 <section class="hero">
-  <canvas id="particle-canvas"></canvas>
-  <h1>Roblox Game <span>Creation & Early Investing</span></h1>
-  <p>
-    Chabungus LLC is a Roblox game creation entity focused on developing our own high-performing games
-     while also investing in and acquiring other games.
-  </p>
-  <a href="#contact" class="cta-btn">Get in Touch</a>
+  <canvas id="particle-canvas" class="hero-canvas"></canvas>
+  <div class="hero-content">
+    <h1 class="hero-title">Roblox Game <span>Creation & Early Investing</span></h1>
+    <p class="hero-subtitle">
+      Chabungus LLC is a Roblox game creation entity focused on developing our own high-performing games
+      while also investing in and acquiring other games.
+    </p>
+    <a href="#contact" class="btn btn-primary">Get in Touch</a>
+  </div>
 </section>
 
-<section id="about">
+<section id="about" class="section">
   <h2>What Chabungus LLC Does</h2>
-  <div class="grid-3">
+  <div class="grid grid-auto">
     <div class="card">
       <h3>Game Development</h3>
       <p>We build Roblox games designed to thrive. Not actively for sale, but available for the right offer.</p>
@@ -54,16 +49,16 @@
   </div>
 </section>
 
-<section id="portfolio">
+<section id="portfolio" class="section">
   <h2>Game Portfolio</h2>
   <p>Performance transparency for acquisition inquiries.</p>
-  <div class="grid-3" id="portfolio-grid"></div>
-  <div class="warning">
+  <div class="grid grid-3" id="portfolio-grid"></div>
+  <div class="callout">
     I can smell a scam from a mile away. Legitimate offers only.
   </div>
 </section>
 
-<section id="invest">
+<section id="invest" class="section">
   <h2>Capital & Growth Partnerships</h2>
   <p>
     If you have a Roblox game with strong retention but limited capital,
@@ -78,7 +73,7 @@
     <li>Percentage-based investment agreements</li>
   </ul>
 
-  <div class="how-business">
+  <div class="panel">
     <h3>How Chabungus Does Business:</h3>
     <p>To consider investing in your Roblox game, please provide the following:</p>
     <ul>
@@ -90,15 +85,15 @@
   </div>
 </section>
 
-<section id="contact">
+<section id="contact" class="section" style="text-align:center;">
   <h2>Contact</h2>
-  <p>
+  <p style="margin-inline:auto;">
     Discord: @js0n44<br>
-    Server: <a class="community discord-link" href="https://discord.gg/kFeZyyzAde" target="_blank">https://discord.gg/kFeZyyzAde</a>
+    Server: <a class="link-accent" href="https://discord.gg/kFeZyyzAde" target="_blank">https://discord.gg/kFeZyyzAde</a>
   </p>
 </section>
 
-<footer>
+<footer class="site-footer">
   © 2026 Chabungus LLC — All Rights Reserved
 </footer>
 
@@ -135,9 +130,7 @@ class Particle {
 
 function initParticles(num = 120) {
   particles = [];
-  for (let i = 0; i < num; i++) {
-    particles.push(new Particle());
-  }
+  for (let i = 0; i < num; i++) particles.push(new Particle());
 }
 
 function animate() {
@@ -157,24 +150,20 @@ animate();
 
 // === PORTFOLIO CONFIG ===
 const games = [
-  { id: "9011180012", ownership: 50, forSale: false, originalCreator: "Chabungus LLC" },
-  { id: "9297684035", ownership: 20, forSale: null, originalCreator: "Chabungus LLC" },
+  { id: "9011180012", ownership: 50,  forSale: false, originalCreator: "Chabungus LLC" },
+  { id: "9297684035", ownership: 20,  forSale: null,  originalCreator: "Chabungus LLC" },
   { id: "9406855770", ownership: 100, forSale: false, originalCreator: "Chabungus LLC" },
-  { id: "4727281805", ownership: 50, forSale: false, originalCreator: "Chabungus LLC" }
+  { id: "4727281805", ownership: 50,  forSale: false, originalCreator: "Chabungus LLC" }
 ];
-
-const MIN_CCU_VISIBLE = 10;
 
 async function buildPortfolio() {
   const container = document.getElementById("portfolio-grid");
   container.innerHTML = "";
   const ids = games.map(g => g.id);
+
   try {
-    const gameRes = await fetch(
-      `https://gamesrobloxcom-proxy.vercel.app/v1/games?universeIds=${ids.join(",")}`
-    );
+    const gameRes  = await fetch(`https://gamesrobloxcom-proxy.vercel.app/v1/games?universeIds=${ids.join(",")}`);
     const gameJson = await gameRes.json();
-    const gameDataArray = gameJson.data;
 
     const thumbPayload = ids.map(id => ({
       requestId: `${id}::GameIcon:512x512:png:regular`,
@@ -185,38 +174,26 @@ async function buildPortfolio() {
       isCircular: false
     }));
 
-    const thumbRes = await fetch(
-      "https://thumbnailsrobloxcom.vercel.app/v1/batch",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(thumbPayload)
-      }
-    );
-
+    const thumbRes  = await fetch("https://thumbnailsrobloxcom.vercel.app/v1/batch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(thumbPayload)
+    });
     const thumbJson = await thumbRes.json();
-    const thumbDataArray = thumbJson.data;
 
     const merged = games.map(gameObj => {
-      const gameData = gameDataArray.find(
-        g => g.id.toString() === gameObj.id
-      );
-      const thumbData = thumbDataArray.find(
-        t => t.targetId.toString() === gameObj.id
-      );
+      const gameData  = gameJson.data.find(g => g.id.toString() === gameObj.id);
+      const thumbData = thumbJson.data.find(t => t.targetId.toString() === gameObj.id);
       if (!gameData) return null;
       return {
         ...gameObj,
-        name: gameData.name,
-        playing: gameData.playing,
-        visits: gameData.visits,
+        name:        gameData.name,
+        playing:     gameData.playing,
+        visits:      gameData.visits,
         rootPlaceId: gameData.rootPlaceId,
         thumbnailUrl: thumbData?.imageUrl || ""
       };
-    }).filter(Boolean);
-
-    const filtered = merged.filter(game => game.playing > MIN_CCU_VISIBLE);
-    merged.sort((a, b) => b.playing - a.playing);
+    }).filter(Boolean).sort((a, b) => b.playing - a.playing);
 
     merged.forEach(game => {
       const card = document.createElement("div");
@@ -224,41 +201,33 @@ async function buildPortfolio() {
       card.style.cursor = "pointer";
 
       card.innerHTML = `
-        <img src="${game.thumbnailUrl}" class="portfolio-thumb" />
-
+        <img src="${game.thumbnailUrl}" class="card-thumb" />
         <h3>${game.name}</h3>
-
-        <div class="live-metric">
-          <div class="live-number">${game.playing.toLocaleString()}</div>
-          <div class="live-label">Live Players</div>
+        <div class="stat-big">
+          <div class="stat-big-number">${game.playing.toLocaleString()}</div>
+          <div class="stat-big-label">Live Players</div>
         </div>
-
-        <div class="secondary-metric">
-          <span>${game.visits.toLocaleString()}</span> total visits
+        <div class="stat-secondary">
+          <strong>${game.visits.toLocaleString()}</strong> total visits
         </div>
-
-        <div class="metric-divider"></div>
-
-        <div class="meta">
+        <div class="card-divider"></div>
+        <div class="card-meta">
           Ownership: ${game.ownership}%<br>
           Created by: ${game.originalCreator}
         </div>
-
         <div class="card-overlay">View on Roblox →</div>
       `;
 
       card.addEventListener("click", () => {
-        const placeId = game.rootPlaceId;
-        const url = `https://www.roblox.com/games/${placeId}`;
-        window.open(url, "_blank");
+        window.open(`https://www.roblox.com/games/${game.rootPlaceId}`, "_blank");
       });
 
       container.appendChild(card);
     });
+
   } catch (err) {
     console.error(err);
-    container.innerHTML =
-      '<p style="color:red;">Failed to load portfolio data.</p>';
+    container.innerHTML = '<p style="color:red;">Failed to load portfolio data.</p>';
   }
 }
 
