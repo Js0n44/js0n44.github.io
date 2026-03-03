@@ -36,7 +36,6 @@
 
 <section class="section">
   <div class="grid grid-3" id="portfolio-grid">
-    <!-- Cards injected by JS -->
     <div class="portfolio-loading">Loading portfolio data…</div>
   </div>
 
@@ -99,10 +98,10 @@ animate();
 
 // === PORTFOLIO CONFIG ===
 const games = [
-  { id: "9011180012", ownership: 50,  forSale: false, originalCreator: "Chabungus LLC" },
-  { id: "9297684035", ownership: 20,  forSale: null,  originalCreator: "Chabungus LLC" },
-  { id: "9406855770", ownership: 100, forSale: false, originalCreator: "Chabungus LLC" },
-  { id: "4727281805", ownership: 50,  forSale: false, originalCreator: "Chabungus LLC" }
+  { id: "9011180012", ownership: 50,  originalCreator: "Chabungus LLC" },
+  { id: "9297684035", ownership: 20,  originalCreator: "Chabungus LLC" },
+  { id: "9406855770", ownership: 100, originalCreator: "Chabungus LLC" },
+  { id: "4727281805", ownership: 50,  originalCreator: "Chabungus LLC" }
 ];
 
 async function buildPortfolio() {
@@ -148,12 +147,6 @@ async function buildPortfolio() {
       .sort((a, b) => b.playing - a.playing);
 
     merged.forEach(game => {
-      const saleStatus = game.forSale === true
-        ? `<span class="badge badge-success">Available</span>`
-        : game.forSale === false
-          ? `<span class="badge badge-danger">Not For Sale</span>`
-          : "";
-
       const card = document.createElement("div");
       card.className = "card";
       card.style.cursor = "pointer";
@@ -172,7 +165,6 @@ async function buildPortfolio() {
           Ownership: ${game.ownership}%<br>
           Created by: ${game.originalCreator}
         </div>
-        ${saleStatus}
         <div class="card-overlay">View on Roblox →</div>
       `;
       card.addEventListener("click", () => {
