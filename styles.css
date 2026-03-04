@@ -19,6 +19,7 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.6;
+  overflow-x: hidden; /* FIX: prevent horizontal scroll on mobile */
 }
 
 img { display: block; max-width: 100%; }
@@ -386,6 +387,17 @@ p {
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
+
+  /* FIX: tighten horizontal padding so cards don't bleed */
+  .section {
+    padding-inline: var(--space-md);
+  }
+
+  /* FIX: single column on tablets too for portfolio specifically */
+  #portfolio-grid {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
 }
 
 @media (max-width: 600px) {
@@ -406,10 +418,30 @@ p {
   }
 
   .section {
+    padding: var(--space-xl) var(--space-md);
     padding-bottom: var(--space-3xl);
+  }
+
+  /* FIX: cards must not escape their container */
+  .card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden; /* clip any internal overflow */
   }
 
   .card:hover {
     transform: none;
+  }
+
+  /* FIX: scale down the big stat number */
+  .stat-big-number {
+    font-size: 1.8rem;
+  }
+
+  /* FIX: callout stays inside flow */
+  .callout {
+    margin-top: var(--space-md);
+    font-size: 0.9rem;
   }
 }
