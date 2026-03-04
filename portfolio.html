@@ -154,6 +154,10 @@
     card.className    = "card";
     card.style.cursor = "pointer";
 
+    const ownershipLabel = game.originalCreator === "Chabungus LLC"
+      ? "Remaining Ownership"
+      : "Ownership";
+
     card.innerHTML = `
       <img src="${game.thumbnailUrl}" class="card-thumb" alt="${game.name}" />
       <h3>${game.name}</h3>
@@ -166,7 +170,7 @@
       </div>
       <div class="card-divider"></div>
       <div class="card-meta">
-        Ownership: ${game.ownership}%<br>
+        ${ownershipLabel}: ${game.ownership}%<br>
         Created by: ${game.originalCreator}
       </div>
       <div class="card-overlay">View on Roblox →</div>
