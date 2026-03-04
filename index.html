@@ -98,7 +98,113 @@
 </footer>
 
 <script>
-// === PARTICLE BACKGROUND ===
+
+// === PORTFOLIO CONFIG (FROM games.json) ===
+async function buildPortfolio() {
+  const container = document.getElementById("portfolio-grid");
+  container.innerHTML = "";
+
+  try {
+    // 1. Load games.json
+    const configRes = await fetch("./games.json");
+    const games = await configRes.json();
+
+    const ids = games.map(g => g.id);
+
+    // 2. Fetch Roblox game data
+    const gameRes = await fetch(
+      `https://gamesrobloxcom-proxy.vercel.app/v1/games?universeIds=${ids.join(",")}`
+    );
+    const gameJson = await gameRes.json();
+
+    // 3. Fetch thumbnails
+    const thumbPayload = ids.map(id => ({
+      requestId: `${id}::GameIcon:512x512:png:regular`,
+      type: "GameIcon",
+      targetId: Number(id),
+      size: "512x512",
+      format: "png",
+      isCircular: false
+    }));
+
+    const thumbRes = await fetch(
+      "https://thumbnailsrobloxcom.vercel.app/v1/batch",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(thumbPayload)
+      }
+    );
+
+    const thumbJson = await thumbRes.json();
+
+    // 4. Merge config + Roblox data
+    const merged = games.map(gameObj => {
+      const gameData  = gameJson.data.find(g => g.id.toString() === gameObj.id);
+      const thumbData = thumbJson.data.find(t => t.targetId.toString() === gameObj.id);
+
+      if (!gameData) return null;
+
+      return {
+        ...gameObj,
+        name: gameData.name,
+        playing: gameData.playing,
+        visits: gameData.visits,
+        rootPlaceId: gameData.rootPlaceId,
+        thumbnailUrl: thumbData?.imageUrl || ""
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.playing - a.playing);
+
+    // 5. Render cards
+    merged.forEach(game => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.style.cursor = "pointer";
+
+      card.innerHTML = `
+        <img src="${game.thumbnailUrl}" class="card-thumb" />
+        <h3>${game.name}</h3>
+
+        <div class="stat-big">
+          <div class="stat-big-number">${game.playing.toLocaleString()}</div>
+          <div class="stat-big-label">Live Players</div>
+        </div>
+
+        <div class="stat-secondary">
+          <strong>${game.visits.toLocaleString()}</strong> total visits
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="card-meta">
+          Ownership: ${game.ownership}%<br>
+          Created by: ${game.originalCreator}
+        </div>
+
+        <div class="card-overlay">View on Roblox →</div>
+      `;
+
+      card.addEventListener("click", () => {
+        window.open(
+          `https://www.roblox.com/games/${game.rootPlaceId}`,
+          "_blank"
+        );
+      });
+
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML =
+      '<p style="color:red;">Failed to load portfolio data.</p>';
+  }
+}
+
+buildPortfolio();
+  
 const canvas = document.getElementById('particle-canvas');
 const ctx = canvas.getContext('2d');
 let particles = [];
