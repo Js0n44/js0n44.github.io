@@ -13,6 +13,9 @@
 </head>
 <body>
 
+<!-- Fullscreen particle canvas -->
+<canvas id="particle-canvas"></canvas>
+
 <header class="site-header">
   <a href="/"><img src="/Chabungus Logo.png" alt="Chabungus LLC" class="site-logo" /></a>
   <nav class="nav">
@@ -24,7 +27,6 @@
 </header>
 
 <section class="hero" style="padding-bottom: 60px;">
-  <canvas id="particle-canvas" class="hero-canvas"></canvas>
   <div class="hero-content">
     <h1 class="hero-title">Game Portfolio</h1>
     <p class="hero-subtitle">
@@ -48,137 +50,92 @@
   © 2026 Chabungus LLC — All Rights Reserved
 </footer>
 
+<!-- Scripts -->
+<script src="particles.js"></script> <!-- Fullscreen particles with cursor repel -->
 <script>
-// === PARTICLE BACKGROUND ===
-const canvas = document.getElementById('particle-canvas');
-const ctx    = canvas.getContext('2d');
-let particles = [];
-let width  = canvas.width  = canvas.offsetWidth;
-let height = canvas.height = canvas.offsetHeight;
-
-class Particle {
-  constructor() {
-    this.x = Math.random() * width;
-    this.y = Math.random() * height;
-    this.radius = Math.random() * 2 + 1;
-    this.vx = (Math.random() - 0.5) * 0.5;
-    this.vy = (Math.random() - 0.5) * 0.5;
+  // === PORTFOLIO CONFIG ===
+  async function loadGames() {
+    const res = await fetch('/games.json');
+    const games = await res.json();
+    return games;
   }
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,122,24,0.6)';
-    ctx.fill();
-  }
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    if (this.x < 0 || this.x > width) this.vx *= -1;
-    if (this.y < 0 || this.y > height) this.vy *= -1;
-    this.draw();
-  }
-}
+  async function buildPortfolio() {
+    const games = await loadGames();
+    const container = document.getElementById("portfolio-grid");
+    container.innerHTML = "";
+    const ids = games.map(g => g.id);
 
-function initParticles(n = 120) {
-  particles = [];
-  for (let i = 0; i < n; i++) particles.push(new Particle());
-}
-function animate() {
-  ctx.clearRect(0, 0, width, height);
-  particles.forEach(p => p.update());
-  requestAnimationFrame(animate);
-}
-window.addEventListener('resize', () => {
-  width  = canvas.width  = canvas.offsetWidth;
-  height = canvas.height = canvas.offsetHeight;
-  initParticles();
-});
-initParticles();
-animate();
+    try {
+      const [gameRes, thumbRes] = await Promise.all([
+        fetch(`https://gamesrobloxcom-proxy.vercel.app/v1/games?universeIds=${ids.join(",")}`),
+        fetch("https://thumbnailsrobloxcom.vercel.app/v1/batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(ids.map(id => ({
+            requestId: `${id}::GameIcon:512x512:png:regular`,
+            type: "GameIcon",
+            targetId: Number(id),
+            size: "512x512",
+            format: "png",
+            isCircular: false
+          })))
+        })
+      ]);
 
-// === PORTFOLIO CONFIG ===
-async function loadGames() {
-  const res = await fetch('/games.json');
-  const games = await res.json();
-  return games;
-}
-async function buildPortfolio() {
-  const games = await loadGames();
-  const container = document.getElementById("portfolio-grid");
-  container.innerHTML = "";
-  const ids = games.map(g => g.id);
+      const { data: gameData  } = await gameRes.json();
+      const { data: thumbData } = await thumbRes.json();
 
-  try {
-    const [gameRes, thumbRes] = await Promise.all([
-      fetch(`https://gamesrobloxcom-proxy.vercel.app/v1/games?universeIds=${ids.join(",")}`),
-      fetch("https://thumbnailsrobloxcom.vercel.app/v1/batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(ids.map(id => ({
-          requestId: `${id}::GameIcon:512x512:png:regular`,
-          type: "GameIcon",
-          targetId: Number(id),
-          size: "512x512",
-          format: "png",
-          isCircular: false
-        })))
-      })
-    ]);
+      const merged = games
+        .map(gameObj => {
+          const gd = gameData.find(g => g.id.toString() === gameObj.id);
+          const td = thumbData.find(t => t.targetId.toString() === gameObj.id);
+          if (!gd) return null;
+          return {
+            ...gameObj,
+            name:         gd.name,
+            playing:      gd.playing,
+            visits:       gd.visits,
+            rootPlaceId:  gd.rootPlaceId,
+            thumbnailUrl: td?.imageUrl || ""
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.playing - a.playing);
 
-    const { data: gameData  } = await gameRes.json();
-    const { data: thumbData } = await thumbRes.json();
-
-    const merged = games
-      .map(gameObj => {
-        const gd = gameData.find(g => g.id.toString() === gameObj.id);
-        const td = thumbData.find(t => t.targetId.toString() === gameObj.id);
-        if (!gd) return null;
-        return {
-          ...gameObj,
-          name:         gd.name,
-          playing:      gd.playing,
-          visits:       gd.visits,
-          rootPlaceId:  gd.rootPlaceId,
-          thumbnailUrl: td?.imageUrl || ""
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => b.playing - a.playing);
-
-    merged.forEach(game => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.style.cursor = "pointer";
-      card.innerHTML = `
-        <img src="${game.thumbnailUrl}" class="card-thumb" alt="${game.name}" />
-        <h3>${game.name}</h3>
-        <div class="stat-big">
-          <div class="stat-big-number">${game.playing.toLocaleString()}</div>
-          <div class="stat-big-label">Live Players</div>
-        </div>
-        <div class="stat-secondary">
-          <strong>${game.visits.toLocaleString()}</strong> total visits
-        </div>
-        <div class="card-divider"></div>
-        <div class="card-meta">
-          Ownership: ${game.ownership}%<br>
-          Created by: ${game.originalCreator}
-        </div>
-        <div class="card-overlay">View on Roblox →</div>
-      `;
-      card.addEventListener("click", () => {
-        window.open(`https://www.roblox.com/games/${game.rootPlaceId}`, "_blank");
+      merged.forEach(game => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.style.cursor = "pointer";
+        card.innerHTML = `
+          <img src="${game.thumbnailUrl}" class="card-thumb" alt="${game.name}" />
+          <h3>${game.name}</h3>
+          <div class="stat-big">
+            <div class="stat-big-number">${game.playing.toLocaleString()}</div>
+            <div class="stat-big-label">Live Players</div>
+          </div>
+          <div class="stat-secondary">
+            <strong>${game.visits.toLocaleString()}</strong> total visits
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-meta">
+            Ownership: ${game.ownership}%<br>
+            Created by: ${game.originalCreator}
+          </div>
+          <div class="card-overlay">View on Roblox →</div>
+        `;
+        card.addEventListener("click", () => {
+          window.open(`https://www.roblox.com/games/${game.rootPlaceId}`, "_blank");
+        });
+        container.appendChild(card);
       });
-      container.appendChild(card);
-    });
 
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = '<p style="color:red;">Failed to load portfolio data.</p>';
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = '<p style="color:red;">Failed to load portfolio data.</p>';
+    }
   }
-}
 
-buildPortfolio();
+  buildPortfolio();
 </script>
 </body>
 </html>
