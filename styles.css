@@ -400,4 +400,16 @@ p {
     margin-left: var(--space-sm);
     font-size: 0.9rem;
   }
+
+  #portfolio-grid {
+    padding-bottom: 0;
+  }
+
+  .section {
+    padding-bottom: var(--space-3xl);
+  }
+
+  .card:hover {
+    transform: none;
+  }
 }
