@@ -255,14 +255,11 @@ initParticles();
 animate();
 
 // === PORTFOLIO CONFIG ===
-const games = [
-  { id: "9011180012", ownership: 50,  forSale: false, originalCreator: "Chabungus LLC" },
-  { id: "9297684035", ownership: 20,  forSale: null,  originalCreator: "Chabungus LLC" },
-  { id: "9406855770", ownership: 100, forSale: false, originalCreator: "Chabungus LLC" },
-  { id: "4727281805", ownership: 50,  forSale: false, originalCreator: "Chabungus LLC" }
-];
+
 
 async function buildPortfolio() {
+  const configRes = await fetch("./games.json");
+  const games = await configRes.json();
   const container = document.getElementById("portfolio-grid");
   container.innerHTML = "";
   const ids = games.map(g => g.id);
