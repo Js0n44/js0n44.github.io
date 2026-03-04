@@ -103,7 +103,7 @@ async function loadGames() {
   return games;
 }
 async function buildPortfolio() {
-  const games = await LoadGames();
+  const games = await loadGames();
   const container = document.getElementById("portfolio-grid");
   container.innerHTML = "";
   const ids = games.map(g => g.id);
