@@ -97,14 +97,13 @@ initParticles();
 animate();
 
 // === PORTFOLIO CONFIG ===
-const games = [
-  { id: "9011180012", ownership: 50,  originalCreator: "Chabungus LLC" },
-  { id: "9297684035", ownership: 20,  originalCreator: "Chabungus LLC" },
-  { id: "9406855770", ownership: 100, originalCreator: "Chabungus LLC" },
-  { id: "4727281805", ownership: 50,  originalCreator: "Chabungus LLC" }
-];
-
+async function loadGames() {
+  const res = await fetch('/games.json');
+  const games = await res.json();
+  return games;
+}
 async function buildPortfolio() {
+  const games = await LoadGames();
   const container = document.getElementById("portfolio-grid");
   container.innerHTML = "";
   const ids = games.map(g => g.id);
