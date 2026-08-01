@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#151515">
+<title>Transaction Tracker</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#151515;color:white;max-width:1200px;margin:auto;padding:clamp(14px,4vw,30px)}h1{text-align:center}.stats{display:flex;gap:20px;margin-bottom:25px}.card{flex:1;background:#252525;border-radius:10px;padding:20px;text-align:center}.card h2{margin:0;font-size:18px;color:#aaa}.card p{margin:10px 0 0;font-size:28px;font-weight:bold}table{width:100%;border-collapse:collapse}th,td{border:1px solid #333;padding:8px}th{background:#222}input,select{width:100%;background:#222;color:white;border:1px solid #444;padding:10px;font-size:16px}button{padding:11px 14px;border:none;border-radius:6px;cursor:pointer;font-size:15px;touch-action:manipulation}.add,.apply,.save-network{background:#4CAF50;color:white}.load-network{background:#2196F3;color:white}.add{margin-bottom:15px}.delete,.cancel{background:#c62828;color:white}.draft-row{background:#1c291d}.draft-row input,.draft-row select{border-color:#4CAF50}.actions,.toolbar{display:flex;gap:6px}.toolbar{align-items:center;margin-bottom:15px;flex-wrap:wrap}.toolbar .add{margin:0}.status{color:#aaa;font-size:13px;min-height:16px;margin-left:6px}.hint{color:#999;font-size:13px;margin:-5px 0 12px}@media(max-width:800px){.stats{flex-direction:column;gap:10px}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}table{min-width:900px}h1{font-size:26px}.card{padding:14px}.card p{font-size:24px}}
+</style>
+</head>
+<body>
+<h1>Transaction Tracker</h1>
+<div class="stats">
+  <div class="card"><h2>Net Change</h2><p id="usdTotal">$0.00</p></div>
+  <div class="card"><h2>Net Change</h2><p id="robuxTotal">0 R$</p></div>
+  <div class="card"><h2>Transactions</h2><p id="count">0</p></div>
+</div>
+<div class="toolbar">
+  <button class="add" id="addButton">+ Add Transaction</button>
+  <button class="save-network" id="saveNetworkButton">Save</button>
+  <button class="load-network" id="loadNetworkButton">Load</button>
+  <span class="status" id="status"></span>
+</div>
+<div class="hint">Fill out the green row, then press Enter or click Apply. It will not affect totals until then.</div>
+<div class="table-wrap"><table>
+<thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Currency</th><th>Type</th><th>Amount</th><th></th></tr></thead>
+<tbody id="tbody"></tbody>
+</table></div>
+<script>
+const ROBUX_TO_USD = 0.0035;
+const BACKUP_SERVER = 'http://192.168.68.200:8766';
+let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+let draft = null;
+function save(){ localStorage.setItem('transactions', JSON.stringify(transactions)); }
+function setStatus(message){const status=document.getElementById('status');status.textContent=message;clearTimeout(window.__statusTimeout);window.__statusTimeout=setTimeout(()=>status.textContent='',3500);}
+function escapeHtml(v){return String(v ?? '').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
+function newId(){return crypto.randomUUID ? crypto.randomUUID() : Date.now()+'-'+Math.random()}
+async function saveToNetwork(){save();try{const response=await fetch(`${BACKUP_SERVER}/save`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transactions,savedAt:new Date().toISOString()})});if(!response.ok) throw new Error(`Server returned ${response.status}`);await response.json();setStatus('Saved locally and to network backup.');}catch(error){console.error(error);setStatus('Saved locally. Network backup unavailable.');}}
+async function loadFromNetwork(){try{const response=await fetch(`${BACKUP_SERVER}/load`);if(!response.ok) throw new Error(`Server returned ${response.status}`);const data=await response.json();if(!data || !Array.isArray(data.transactions)) throw new Error('Invalid accounting backup');transactions=data.transactions;draft=null;save();render();setStatus('Loaded from network backup.');}catch(error){console.error(error);setStatus('Network backup unavailable.');}}
+function updateStats(){let totalUSD=0;for(const t of transactions){const amount=Number(t.amount)||0;const usd=t.currency==='USD' ? amount : amount*ROBUX_TO_USD;totalUSD += t.type==='Income' ? usd : -usd;}document.getElementById('usdTotal').textContent=(totalUSD<0?'-$':'$')+Math.abs(totalUSD).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});const totalRobux=totalUSD/ROBUX_TO_USD;document.getElementById('robuxTotal').textContent=Math.round(totalRobux).toLocaleString()+' R$';document.getElementById('count').textContent=transactions.length;}
+function rowHtml(t,isDraft=false){const a=isDraft?'data-draft="true"':`data-id="${t.id}"`;return `<tr class="${isDraft?'draft-row':''}" ${a}><td><input type="date" data-field="date" value="${escapeHtml(t.date)}"></td><td><input data-field="description" value="${escapeHtml(t.description)}" placeholder="Description"></td><td><input data-field="category" value="${escapeHtml(t.category)}" placeholder="Category"></td><td><select data-field="currency"><option value="USD" ${t.currency==='USD'?'selected':''}>USD</option><option value="R$" ${t.currency==='R$'?'selected':''}>R$</option></select></td><td><select data-field="type"><option value="Income" ${t.type==='Income'?'selected':''}>Income</option><option value="Expense" ${t.type==='Expense'?'selected':''}>Expense</option></select></td><td><input type="number" step="any" data-field="amount" value="${escapeHtml(t.amount)}" placeholder="0"></td><td>${isDraft?'<div class="actions"><button class="apply" type="button">Apply</button><button class="cancel" type="button">Cancel</button></div>':`<button class="delete" type="button" data-delete="${t.id}">Delete</button>`}</td></tr>`;}
+function render(){const body=document.getElementById('tbody');body.innerHTML=(draft?rowHtml(draft,true):'')+transactions.map(t=>rowHtml(t)).join('');updateStats();}
+function collectRow(row){const result={};row.querySelectorAll('[data-field]').forEach(el=>result[el.dataset.field]=el.value);result.amount=Number(result.amount)||0;return result;}
+function applyDraft(){if(!draft)return;const row=document.querySelector('.draft-row');if(!row)return;const values=collectRow(row);transactions.unshift({id:newId(),...values});draft=null;save();render();}
+function cancelDraft(){draft=null;render()}
+function startDraft(){if(draft){document.querySelector('.draft-row input[data-field="description"]')?.focus();return}draft={date:new Date().toISOString().slice(0,10),description:'',category:'',currency:'USD',type:'Income',amount:''};render();document.querySelector('.draft-row input[data-field="description"]')?.focus();}
+function updateSavedRow(row){const id=row.dataset.id;const t=transactions.find(x=>x.id===id);if(!t)return;Object.assign(t,collectRow(row));save();updateStats();}
+document.getElementById('addButton').addEventListener('click',startDraft);document.getElementById('saveNetworkButton').addEventListener('click',saveToNetwork);document.getElementById('loadNetworkButton').addEventListener('click',loadFromNetwork);const tbody=document.getElementById('tbody');tbody.addEventListener('click',e=>{if(e.target.matches('.apply'))applyDraft();else if(e.target.matches('.cancel'))cancelDraft();else if(e.target.matches('[data-delete]')){transactions=transactions.filter(t=>t.id!==e.target.dataset.delete);save();render();}});tbody.addEventListener('keydown',e=>{const row=e.target.closest('tr');if(!row||e.key!=='Enter')return;e.preventDefault();if(row.classList.contains('draft-row'))applyDraft();else{updateSavedRow(row);e.target.blur();}});tbody.addEventListener('change',e=>{const row=e.target.closest('tr[data-id]');if(row)updateSavedRow(row);});tbody.addEventListener('focusout',e=>{const row=e.target.closest('tr[data-id]');if(row&&e.target.matches('input[data-field]'))updateSavedRow(row);});render();
+</script>
+</body>
+</html>
